@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{${layout}}">
+<head>
+    <title>Order Confirmation</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<th:block th:replace="~{${layout}::navbar}"></th:block>
+<section layout:fragment="content" class="container">
+    <h1>Order Confirmation</h1>
+    <div class="alert alert-success" th:text="${message}"></div>
+    <p>Thank you for your purchase! Your order has been placed successfully.</p>
+    <div>
+        <h2>Order Details</h2>
+        <p><strong>Customer Name:</strong> <span th:text="${order.customerName}"></span></p>
+        <p><strong>Shipping Address:</strong> <span th:text="${order.shippingAddress}"></span></p>
+        <p><strong>Phone Number:</strong> <span th:text="${order.phoneNumber}"></span></p>
+        <p><strong>Email:</strong> <span th:text="${order.email}"></span></p>
+        <p><strong>Notes:</strong> <span th:text="${order.notes}"></span></p>
+        <p><strong>Discount Code:</strong> <span th:text="${order.discountCode?.code} ?: 'None'"></span></p>
+        <p><strong>Discount Amount:</strong> <span th:text="${#numbers.formatCurrency(order.discountAmount)}"></span></p>
+        <p><strong>Total Amount:</strong> <span th:text="${#numbers.formatCurrency(totalAmount)}"></span></p>
+    </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

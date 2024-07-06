@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{${layout}}">
+<head>
+    <title th:text="${title} ?: 'Place Order'">Place Order</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<th:block th:replace="~{${layout}::navbar}"></th:block>
+<section layout:fragment="content" class="container">
+    <h1>Place Your Order</h1>
+    <form th:action="@{/order/submit}" method="post" id="checkoutForm">
+        <div class="mb-3">
+            <label for="customerName" class="form-label">Your Name:</label>
+            <input type="text" id="customerName" name="customerName" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="shippingAddress" class="form-label">Shipping Address:</label>
+            <input type="text" id="shippingAddress" name="shippingAddress" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="phoneNumber" class="form-label">Phone Number:</label>
+            <input type="text" id="phoneNumber" name="phoneNumber" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email:</label>
+            <input type="email" id="email" name="email" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="notes" class="form-label">Notes:</label>
+            <textarea id="notes" name="notes" class="form-control"></textarea>
+        </div>
+        <div class="mb-3">
+            <input type="hidden" id="discountCode" name="discountCode" th:value="${discountCode}">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Order</button>
+    </form>
+    <!-- Thêm thông tin đơn hàng -->
+    <div th:if="${order != null}">
+        <h3>Order Information</h3>
+        <p>Customer Name: <span th:text="${order.customerName}"></span></p>
+        <p>Total Price Before Discount: <span th:text="${order.totalPriceBeforeDiscount}"></span></p>
+        <p>Discount: <span th:text="${order.discountCode.percentage}"></span>%</p>
+        <p>Total Price After Discount: <span th:text="${order.totalPrice}"></span></p>
+    </div>
+</section>
+<script>
+    $(document).ready(function() {
+        var discountCode = new URLSearchParams(window.location.search).get('discountCode');
+        if (discountCode) {
+            $('#discountCode').val(discountCode);
+        }
+    });
+</script>
+</body>
+</html>

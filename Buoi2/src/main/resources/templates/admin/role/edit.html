@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Role</title>
+</head>
+<body>
+<h1>Edit Role</h1>
+<form th:action="@{/admin/roles/edit/{id}(id=${role.id})}" th:object="${role}" method="post">
+    <div>
+        <label for="name">Name:</label>
+        <input type="text" id="name" th:field="*{name}"/>
+        <span th:if="${name_error}" th:text="${name_error}"></span>
+    </div>
+    <div>
+        <label for="description">Description:</label>
+        <input type="text" id="description" th:field="*{description}"/>
+        <span th:if="${description_error}" th:text="${description_error}"></span>
+    </div>
+    <div>
+        <button type="submit">Save</button>
+    </div>
+</form>
+<a th:href="@{/admin/roles}">Back to List</a>
+</body>
+</html>
