@@ -3,6 +3,7 @@ package com.example.Buoi2.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,7 +25,7 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "discount_id")
-    private Discount discountCode;  // Đổi thành discountCode để khớp với ánh xạ mappedBy trong Discount
+    private Discount discountCode;
 
     private double discountAmount;
 
@@ -32,4 +33,7 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderDetail> orderDetails = new HashSet<>();
+    private String status;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date orderDate;
 }

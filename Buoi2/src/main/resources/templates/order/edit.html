@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chỉnh sửa đơn hàng</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<section class="container">
+    <h1 class="mb-4">Chỉnh sửa đơn hàng</h1>
+    <form th:action="@{/order/update}" th:object="${order}" method="post">
+        <input type="hidden" th:field="*{id}">
+        <div class="mb-3">
+            <label for="customerName" class="form-label">Tên khách hàng</label>
+            <input type="text" class="form-control" id="customerName" th:field="*{customerName}">
+        </div>
+        <div class="mb-3">
+            <label for="shippingAddress" class="form-label">Địa chỉ</label>
+            <input type="text" class="form-control" id="shippingAddress" th:field="*{shippingAddress}">
+        </div>
+        <div class="mb-3">
+            <label for="phoneNumber" class="form-label">Số điện thoại</label>
+            <input type="text" class="form-control" id="phoneNumber" th:field="*{phoneNumber}">
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" th:field="*{email}">
+        </div>
+        <div class="mb-3">
+            <label for="notes" class="form-label">Ghi chú</label>
+            <textarea class="form-control" id="notes" th:field="*{notes}"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="status" class="form-label">Trạng thái</label>
+            <select class="form-control" id="status" th:field="*{status}">
+                <option value="Đã nhận hàng" th:selected="${order.status == 'Đã nhận hàng'}">Đã nhận hàng</option>
+                <option value="Chưa nhận hàng" th:selected="${order.status == 'Chưa nhận hàng'}">Chưa nhận hàng</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Cập nhật</button>
+        <a th:href="@{/order/list}" class="btn btn-secondary">Quay lại</a>
+    </form>
+</section>
+</body>
+</html>

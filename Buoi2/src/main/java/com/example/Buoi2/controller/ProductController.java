@@ -3,21 +3,17 @@ package com.example.Buoi2.controller;
 import com.example.Buoi2.entity.Product;
 import com.example.Buoi2.services.CategoryService;
 import com.example.Buoi2.services.ProductService;
+import com.example.Buoi2.services.RatingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -30,14 +26,24 @@ public class ProductController {
     @Autowired
     private CategoryService categoryService;
 
-    // Display a list of all products
+    @Autowired
+    private RatingService ratingService;
+
     @GetMapping
     public String showProductList(Model model) {
         model.addAttribute("products", productService.getAllProducts());
         return "/products/products-list";
     }
 
-    // For adding a new product
+    @GetMapping("/sorted")
+    public String showSortedProductList(@RequestParam(required = false) String sortField,
+                                        @RequestParam(required = false) String sortDir,
+                                        Model model) {
+        List<Product> sortedProducts = productService.getAllProducts(sortField, sortDir);
+        model.addAttribute("products", sortedProducts);
+        return "/products/products-list";
+    }
+
     @GetMapping("/add")
     public String showAddForm(Model model) {
         model.addAttribute("product", new Product());
@@ -45,7 +51,6 @@ public class ProductController {
         return "/products/add-product";
     }
 
-    // Process the form for adding a new product
     @PostMapping("/add")
     public String addProduct(@Valid Product product, BindingResult result, @RequestParam("image") MultipartFile imageFile) {
         if (result.hasErrors()) {
@@ -64,14 +69,12 @@ public class ProductController {
     }
 
     private String saveImageStatic(MultipartFile image) throws IOException {
-        File saveFile = new ClassPathResource("static/images").getFile();
-        String fileName = UUID.randomUUID()+ "." + StringUtils.getFilenameExtension(image.getOriginalFilename());
-        Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + fileName);
-        Files.copy(image.getInputStream(), path);
+        String fileName = UUID.randomUUID()+ "." + org.springframework.util.StringUtils.getFilenameExtension(image.getOriginalFilename());
+        java.nio.file.Path path = java.nio.file.Paths.get(new org.springframework.core.io.ClassPathResource("static/images").getFile().getAbsolutePath() + java.io.File.separator + fileName);
+        java.nio.file.Files.copy(image.getInputStream(), path);
         return fileName;
     }
 
-    // For editing a product
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         Product product = productService.getProductById(id)
@@ -89,18 +92,15 @@ public class ProductController {
             return "/products/update-product";
         }
 
-        // Retrieve the existing product from the database
         Product existingProduct = productService.getProductById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid product Id:" + id));
 
-        // Update the existing product's fields with the new values
         existingProduct.setName(product.getName());
         existingProduct.setOriginalPrice(product.getOriginalPrice());
         existingProduct.setDiscountedPrice(product.getDiscountedPrice());
         existingProduct.setDescription(product.getDescription());
         existingProduct.setQuantity(product.getQuantity());
 
-        // Check if a new image file is uploaded
         if (!imageFile.isEmpty()) {
             try {
                 String imageName = saveImageStatic(imageFile);
@@ -110,15 +110,28 @@ public class ProductController {
             }
         }
 
-        // Save the updated product
         productService.updateProduct(existingProduct);
         return "redirect:/products";
     }
 
-    // Handle request to delete a product
     @GetMapping("/delete/{id}")
     public String deleteProduct(@PathVariable Long id) {
         productService.deleteProductById(id);
         return "redirect:/products";
+    }
+
+    @GetMapping("/detail/{id}")
+    public String showProductDetails(@PathVariable Long id, Model model) {
+        Product product = productService.getProductById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid product Id:" + id));
+        model.addAttribute("product", product);
+        model.addAttribute("ratings", ratingService.getRatingsByProductId(id));
+        return "/products/product-detail";
+    }
+    @GetMapping("/search")
+    public String searchProducts(@RequestParam("name") String name, Model model) {
+        List<Product> products = productService.searchProductsByName(name);
+        model.addAttribute("products", products);
+        return "/products/products-list";
     }
 }

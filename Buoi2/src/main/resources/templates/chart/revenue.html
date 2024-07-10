@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Revenue Statistics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        /* Custom styles can go here */
+    </style>
+</head>
+<body>
+<!-- Include the admin layout navbar -->
+<header th:replace="admin_layout :: navbar"></header>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h1>Revenue Statistics</h1>
+            <div class="card">
+                <div class="card-body">
+                    <canvas id="revenueChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <h2>Orders List</h2>
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Customer Name</th>
+                    <th>Total Amount</th>
+                    <th>Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order : ${orders}">
+                    <td th:text="${order.id}"></td>
+                    <td th:text="${order.customerName}"></td>
+                    <td th:text="${order.totalAmount != null ? #numbers.formatDecimal(order.totalAmount, 2, '.', ',') : 'N/A'}"></td>
+                    <td th:text="${#dates.format(order.orderDate, 'dd/MM/yyyy HH:mm')}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Include the admin layout footer -->
+<footer th:replace="admin_layout :: footer"></footer>
+
+<!-- JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+     var revenueByMonthJson = /*[[${#json.toJson(revenueByMonth)}]]*/ '{}';
+     var revenueByMonthObj = JSON.parse(revenueByMonthJson);
+
+     var monthLabels = Object.keys(revenueByMonthObj);
+     var revenueData = Object.values(revenueByMonthObj).map(value => parseFloat(value.replace(",", ""))); // Convert to float
+
+     // Chart initialization
+     var ctx = document.getElementById('revenueChart').getContext('2d');
+     var myChart = new Chart(ctx, {
+         type: 'line',
+         data: {
+             labels: monthLabels,
+             datasets: [{
+                 label: 'Revenue',
+                 data: revenueData, // Sử dụng giá trị đã chuyển đổi
+                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                 borderColor: 'rgba(54, 162, 235, 1)',
+                 borderWidth: 1
+             }]
+         },
+         options: {
+             scales: {
+                 y: {
+                     beginAtZero: true,
+                     title: {
+                         display: true,
+                         text: 'Revenue'
+                     }
+                 },
+                 x: {
+                     title: {
+                         display: true,
+                         text: 'Month'
+                     }
+                 }
+             }
+         }
+     });
+ });
+</script>
+
+</body>
+</html>

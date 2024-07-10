@@ -13,6 +13,24 @@
 <section layout:fragment="content" class="container">
   <h1 class="mb-4">Products List</h1>
   <a sec:authorize="hasAnyAuthority('ADMIN')" th:href="@{/products/add}" class="btn btn-primary btn-add">Add New Product</a>
+
+  <!-- Search Form -->
+  <form th:action="@{/products/search}" method="get" class="d-flex mb-3">
+    <input type="text" name="name" class="form-control" placeholder="Nhập tên sản phẩm" required>
+    <button type="submit" class="btn btn-primary ms-2">Tìm kiếm</button>
+  </form>
+
+  <div class="mb-3">
+    <label for="sortDropdown" class="form-label">Sắp xếp theo:</label>
+    <select id="sortDropdown" class="form-select" onchange="location = this.value;">
+      <option value="" disabled selected>Chọn loại sắp xếp</option>
+      <option th:value="@{/products/sorted(sortField='name', sortDir='asc')}">Tên tăng dần</option>
+      <option th:value="@{/products/sorted(sortField='name', sortDir='desc')}">Tên giảm dần</option>
+      <option th:value="@{/products/sorted(sortField='originalPrice', sortDir='asc')}">Giá tăng dần</option>
+      <option th:value="@{/products/sorted(sortField='originalPrice', sortDir='desc')}">Giá giảm dần</option>
+    </select>
+  </div>
+
   <table class="table table-bordered table-hover">
     <thead class="table-dark">
     <tr>
@@ -25,6 +43,8 @@
       <th>Image</th>
       <th>Actions</th>
       <th>Add To Cart</th>
+      <th>Rating</th>
+      <th>Detail</th>
     </tr>
     </thead>
     <tbody>
@@ -48,6 +68,12 @@
           <input type="hidden" th:value="${product.id}" name="productId"/>
           <button type="submit" class="btn btn-warning btn-sm">Add to Cart</button>
         </form>
+      </td>
+      <td>
+        <a th:href="@{/ratings/add/{productId}(productId=${product.id})}" class="btn btn-info btn-sm">Đánh giá</a>
+      </td>
+      <td>
+        <a th:href="@{/products/detail/{id}(id=${product.id})}" class="btn btn-primary btn-sm">View Details</a>
       </td>
     </tr>
     </tbody>
